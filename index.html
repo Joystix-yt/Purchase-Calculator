@@ -1,1 +1,448 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Work Time Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            width: 100%;
+            text-align: center;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        h1, h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        h1 {
+            font-size: 2rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            background: white;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .secondary-btn {
+            background: #6c757d;
+        }
+
+        .secondary-btn:hover {
+            background: #5a6268;
+            box-shadow: 0 10px 20px rgba(108, 117, 125, 0.3);
+        }
+
+        .yes-btn {
+            background: #28a745;
+        }
+
+        .yes-btn:hover {
+            background: #218838;
+            box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        .no-btn {
+            background: #dc3545;
+        }
+
+        .no-btn:hover {
+            background: #c82333;
+            box-shadow: 0 10px 20px rgba(220, 53, 69, 0.3);
+        }
+
+        .stats {
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .calculation-result {
+            background: rgba(118, 75, 162, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        .time-highlight {
+            font-size: 24px;
+            font-weight: bold;
+            color: #764ba2;
+            margin: 10px 0;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .back-btn {
+            background: #6c757d;
+            padding: 10px 20px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <!-- Setup Screen -->
+            <div class="screen active" id="setupScreen">
+                <h1>💰 Work Time Calculator</h1>
+                <p style="margin-bottom: 30px; color: #666;">Let's set up your hourly wage to get started</p>
+                
+                <div class="input-group">
+                    <label for="hourlyPay">Hourly Pay</label>
+                    <input type="number" id="hourlyPay" placeholder="25.00" step="0.01" min="0">
+                </div>
+                
+                <div class="input-group">
+                    <label for="currency">Currency</label>
+                    <select id="currency">
+                        <option value="USD">USD ($)</option>
+                        <option value="EUR">EUR (€)</option>
+                        <option value="GBP">GBP (£)</option>
+                        <option value="CAD">CAD ($)</option>
+                        <option value="AUD">AUD ($)</option>
+                        <option value="JPY">JPY (¥)</option>
+                    </select>
+                </div>
+                
+                <button onclick="saveSettings()">Get Started</button>
+            </div>
+
+            <!-- Main Screen -->
+            <div class="screen" id="mainScreen">
+                <h1>🛒 Purchase Calculator</h1>
+                
+                <div class="stats">
+                    <div class="stat-item">
+                        <span>Money Saved:</span>
+                        <span class="stat-value" id="moneySaved">$0.00</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Items Avoided:</span>
+                        <span class="stat-value" id="itemsAvoided">0</span>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="itemCost">Item Cost</label>
+                    <input type="number" id="itemCost" placeholder="150.00" step="0.01" min="0">
+                </div>
+                
+                <button onclick="calculateWorkTime()">Calculate Work Time</button>
+                
+                <div class="nav-buttons">
+                    <button class="secondary-btn" onclick="showSettings()">Settings</button>
+                </div>
+            </div>
+
+            <!-- Calculation Result Screen -->
+            <div class="screen" id="resultScreen">
+                <h2>⏰ Time to Earn</h2>
+                
+                <div class="calculation-result">
+                    <div>To buy this item, you would need to work:</div>
+                    <div class="time-highlight" id="workTimeResult"></div>
+                    <div style="margin-top: 15px; font-weight: bold;">Worth it?</div>
+                </div>
+                
+                <div style="display: flex; gap: 15px; justify-content: center;">
+                    <button class="yes-btn" onclick="buyItem()">Yes, Buy It</button>
+                    <button class="no-btn" onclick="saveInstead()">No, Save Money</button>
+                </div>
+                
+                <div class="nav-buttons">
+                    <button class="back-btn" onclick="showMain()">Back</button>
+                </div>
+            </div>
+
+            <!-- Settings Screen -->
+            <div class="screen" id="settingsScreen">
+                <h2>⚙️ Settings</h2>
+                
+                <div class="input-group">
+                    <label for="settingsHourlyPay">Hourly Pay</label>
+                    <input type="number" id="settingsHourlyPay" step="0.01" min="0">
+                </div>
+                
+                <div class="input-group">
+                    <label for="settingsCurrency">Currency</label>
+                    <select id="settingsCurrency">
+                        <option value="USD">USD ($)</option>
+                        <option value="EUR">EUR (€)</option>
+                        <option value="GBP">GBP (£)</option>
+                        <option value="CAD">CAD ($)</option>
+                        <option value="AUD">AUD ($)</option>
+                        <option value="JPY">JPY (¥)</option>
+                    </select>
+                </div>
+                
+                <button onclick="updateSettings()">Save Settings</button>
+                <button class="secondary-btn" onclick="resetData()">Reset All Data</button>
+                
+                <div class="nav-buttons">
+                    <button class="back-btn" onclick="showMain()">Back to Main</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // In-memory storage (replace with localStorage in your own environment)
+        let appData = {
+            hourlyPay: 0,
+            currency: 'USD',
+            moneySaved: 0,
+            itemsAvoided: 0
+        };
+
+        const currencySymbols = {
+            USD: '$',
+            EUR: '€',
+            GBP: '£',
+            CAD: '$',
+            AUD: '$',
+            JPY: '¥'
+        };
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function saveSettings() {
+            const hourlyPay = parseFloat(document.getElementById('hourlyPay').value);
+            const currency = document.getElementById('currency').value;
+            
+            if (!hourlyPay || hourlyPay <= 0) {
+                alert('Please enter a valid hourly pay');
+                return;
+            }
+            
+            appData.hourlyPay = hourlyPay;
+            appData.currency = currency;
+            
+            updateDisplay();
+            showScreen('mainScreen');
+        }
+
+        function showSettings() {
+            document.getElementById('settingsHourlyPay').value = appData.hourlyPay;
+            document.getElementById('settingsCurrency').value = appData.currency;
+            showScreen('settingsScreen');
+        }
+
+        function updateSettings() {
+            const hourlyPay = parseFloat(document.getElementById('settingsHourlyPay').value);
+            const currency = document.getElementById('settingsCurrency').value;
+            
+            if (!hourlyPay || hourlyPay <= 0) {
+                alert('Please enter a valid hourly pay');
+                return;
+            }
+            
+            appData.hourlyPay = hourlyPay;
+            appData.currency = currency;
+            
+            updateDisplay();
+            showScreen('mainScreen');
+        }
+
+        function showMain() {
+            updateDisplay();
+            showScreen('mainScreen');
+        }
+
+        function calculateWorkTime() {
+            const itemCost = parseFloat(document.getElementById('itemCost').value);
+            
+            if (!itemCost || itemCost <= 0) {
+                alert('Please enter a valid item cost');
+                return;
+            }
+            
+            const workHours = itemCost / appData.hourlyPay;
+            const timeString = formatWorkTime(workHours);
+            
+            document.getElementById('workTimeResult').textContent = timeString;
+            showScreen('resultScreen');
+        }
+
+        function formatWorkTime(hours) {
+            if (hours < 1) {
+                const minutes = Math.round(hours * 60);
+                return `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+            } else if (hours < 8) {
+                const wholeHours = Math.floor(hours);
+                const minutes = Math.round((hours - wholeHours) * 60);
+                if (minutes === 0) {
+                    return `${wholeHours} hour${wholeHours !== 1 ? 's' : ''}`;
+                } else {
+                    return `${wholeHours} hour${wholeHours !== 1 ? 's' : ''} ${minutes} minute${minutes !== 1 ? 's' : ''}`;
+                }
+            } else if (hours < 40) {
+                const days = Math.round(hours / 8 * 10) / 10;
+                return `${days} work day${days !== 1 ? 's' : ''}`;
+            } else if (hours < 160) {
+                const weeks = Math.round(hours / 40 * 10) / 10;
+                return `${weeks} work week${weeks !== 1 ? 's' : ''}`;
+            } else {
+                const months = Math.round(hours / 160 * 10) / 10;
+                return `${months} work month${months !== 1 ? 's' : ''}`;
+            }
+        }
+
+        function buyItem() {
+            showScreen('mainScreen');
+        }
+
+        function saveInstead() {
+            const itemCost = parseFloat(document.getElementById('itemCost').value);
+            appData.moneySaved += itemCost;
+            appData.itemsAvoided += 1;
+            
+            document.getElementById('itemCost').value = '';
+            updateDisplay();
+            showScreen('mainScreen');
+        }
+
+        function updateDisplay() {
+            const symbol = currencySymbols[appData.currency];
+            document.getElementById('moneySaved').textContent = `${symbol}${appData.moneySaved.toFixed(2)}`;
+            document.getElementById('itemsAvoided').textContent = appData.itemsAvoided;
+        }
+
+        function resetData() {
+            if (confirm('Are you sure you want to reset all data? This cannot be undone.')) {
+                appData.moneySaved = 0;
+                appData.itemsAvoided = 0;
+                updateDisplay();
+            }
+        }
+
+        // Initialize display
+        updateDisplay();
+    </script>
+</body>
+</html>
